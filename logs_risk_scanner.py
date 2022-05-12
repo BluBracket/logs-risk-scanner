@@ -6,7 +6,6 @@ import subprocess
 import sys
 
 import click
-from dotenv import load_dotenv
 
 
 @click.command()
@@ -27,14 +26,11 @@ def scan_logs_dir(directory, output):
 
 
 def _scan_logs_dir(directory, out):
-    load_dotenv()
 
     for root, dirs, files in os.walk(directory):
 
         for filename in files:
             path = os.path.join(root, filename)
-            # rel_path = os.path.relpath(path, directory)
-            # click.echo(rel_path)
             scan_file(path, directory, out)
 
 
@@ -120,11 +116,11 @@ def _get_and_process_risks(root_dir, ext, input_file, out):
         risk = json.loads(risk_line)
         risk_local_path = risk.get('local_path', '')
         # risk_local_path supposed to have the full path that consists
-        # of both path of the archive itself and path inside the archive
+        # of both path of the archive itself and path inside the archive, e.g. logs.zip:2022-05-12.log
         if not risk_local_path:
             continue
 
-        # get the
+        # get the extension of archived file to determine should it be filtered out or not
         risk_file_ext = pathlib.Path(risk_local_path).suffix
         if risk_file_ext not in _log_exts:
             rel_path = os.path.relpath(risk_local_path, root_dir)
